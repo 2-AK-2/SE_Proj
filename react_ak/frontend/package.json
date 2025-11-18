@@ -1,34 +1,27 @@
 {
-  "name": "cabify-frontend",
-  "version": "1.0.0",
+  "name": "frontend",
+  "version": "0.1.0",
   "private": true,
-  "description": "Cabify Rider & Driver Web App - Frontend",
   "dependencies": {
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "axios": "^1.13.2",
-    "leaflet": "^1.9.4",
-    "lucide-react": "^0.552.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-leaflet": "^4.2.1",
-    "react-router-dom": "^6.22.3",
+    "axios": "^1.3.4",
+    "jwt-decode": "^3.1.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.8.1",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
-  },
-  "devDependencies": {
-    "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.18"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint src --ext .js,.jsx"
+    "lint": "eslint . --ext .js,.jsx --format json --output-file lint-report.json",
+    "coverage": "react-scripts test --coverage --watchAll=false --coverageReporters='html' --coverageReporters='json-summary' --coverageThreshold='{\"global\": {\"lines\": 75}}' ",
+    "security": "npm audit --json > security-report.json"
   },
   "eslintConfig": {
     "extends": [
@@ -48,9 +41,14 @@
       "last 1 safari version"
     ]
   },
+  "devDependencies": {
+    "eslint": "^8.0.0"
+  },
   "jest": {
-    "transformIgnorePatterns": [
-      "/node_modules/(?!axios)/"
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}",
+      "!src/index.js",
+      "!src/reportWebVitals.js"
     ]
   }
 }

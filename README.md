@@ -117,3 +117,46 @@ This project is developed for educational purposes as part of the PES University
 **Institution:** PES University  
 **Academic Year:** 2025  
 **Semester:** 5th Sem
+
+## CI/CD Pipeline
+
+[cite_start]This project uses GitHub Actions for Continuous Integration and Continuous Deployment (CI/CD)[cite: 4233]. The pipeline is defined in `.github/workflows/ci.yml` and is designed to ensure code quality, test coverage, and security.
+
+The pipeline runs on every `push` and `pull_request` to the `main` branch.
+
+### Pipeline Stages
+
+[cite_start]Our pipeline consists of 5 main stages, as required by the project rubric[cite: 4234]:
+
+1.  [cite_start]**Build:** Installs all `npm` dependencies for both the `backend` and `frontend` using `npm ci` to ensure reproducible builds[cite: 4235].
+2.  [cite_start]**Test & Coverage:** Runs the full test suite (Unit, Integration, and System tests) for both backend and frontend using `jest`[cite: 4236].
+3.  [cite_start]**Coverage (Quality Gate):** This stage simultaneously checks if the test coverage meets the **$\ge 75\%$** project requirement[cite: 4237, 4242]. If coverage is below 75%, the pipeline fails.
+4.  [cite_start]**Lint (Quality Gate):** Performs static code analysis using `ESLint` to check for code style and errors[cite: 4238]. Lint reports are saved as artifacts.
+5.  [cite_start]**Security:** Runs `npm audit` on both `backend` and `frontend` to scan for known vulnerabilities in dependencies[cite: 4239]. Security reports are saved as artifacts.
+
+### Deployment Artifact
+
+[cite_start]After all 5 stages pass, a final job creates the **Deployment Artifact**[cite: 4240]. This job:
+1.  Downloads all reports (Coverage, Lint, Security).
+2.  Copies the source code (`react_ak/`), the `README.md`, and `package.json` files.
+3.  Zips all these files into a single `deployment-package.zip` file.
+4.  Uploads this zip file as a GitHub Artifact, ready for evaluation.
+
+### [cite_start]Running Locally [cite: 4245]
+
+You can run the key pipeline stages locally:
+
+```bash
+# From root directory
+# Run Backend Tests (with coverage check)
+npm run coverage --prefix react_ak/backend
+
+# Run Frontend Tests (with coverage check)
+npm run coverage --prefix react_ak/frontend
+
+# Run Backend Lint
+npm run lint --prefix react_ak/backend
+
+# Run Backend Security Scan
+npm run security --prefix react_ak/backend
+```
