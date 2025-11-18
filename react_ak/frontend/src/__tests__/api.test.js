@@ -1,30 +1,32 @@
 import { fareAPI } from "../api/api";
 import axios from "axios";
 
-// 1. Define the mock instance OUTSIDE the mock factory
-// This allows us to use it in our tests to check calls
-const mockAxiosInstance = {
-  get: jest.fn(),
-  post: jest.fn(),
-  put: jest.fn(),
-  delete: jest.fn(),
-  interceptors: {
-    request: { use: jest.fn(), eject: jest.fn() },
-    response: { use: jest.fn(), eject: jest.fn() },
-  },
-  defaults: { headers: { common: {} } },
-};
+// FIX: Define the mock inside the factory to avoid ReferenceError (hoisting issues)
+jest.mock("axios", () => {
+  const mockAxiosInstance = {
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    delete: jest.fn(),
+    interceptors: {
+      request: { use: jest.fn(), eject: jest.fn() },
+      response: { use: jest.fn(), eject: jest.fn() },
+    },
+    defaults: { headers: { common: {} } },
+  };
 
-// 2. Mock axios to return our shared instance
-jest.mock("axios", () => ({
-  create: jest.fn(() => mockAxiosInstance),
-  // Add default export methods if your code uses axios.get/post directly
-  get: jest.fn(),
-  post: jest.fn(),
-}));
+  return {
+    // This handles 'import axios from "axios"'
+    __esModule: true,
+    default: {
+      create: jest.fn(() => mockAxiosInstance),
+    },
+    // This handles if axios is required or used as a named import
+    create: jest.fn(() => mockAxiosInstance),
+  };
+});
 
 describe("Fare API", () => {
-  // Clear mocks before each test to ensure clean state
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -34,16 +36,17 @@ describe("Fare API", () => {
   });
 
   test("getFare calls the correct endpoint", async () => {
-    // Setup the mock response
+    // 1. Create the instance (this will return our mock above)
+    const axiosInstance = axios.create();
+    
+    // 2. Setup the mock response
     const mockResponse = { data: { fare: 250 } };
-    mockAxiosInstance.post.mockResolvedValue(mockResponse);
+    axiosInstance.post.mockResolvedValue(mockResponse);
 
-    // Call the API function
-    // Note: Adjust arguments to match your actual fareAPI.getFare signature
-    // If getFare(pickup, drop) -> we pass dummy strings
+    // 3. Call the API function
     await fareAPI.getFare("Kormangala", "Indiranagar");
 
-    // Verify that axios.post was actually called
-    expect(mockAxiosInstance.post).toHaveBeenCalled();
+    // 4. Verify post was called
+    expect(axiosInstance.post).toHaveBeenCalled();
   });
 });
