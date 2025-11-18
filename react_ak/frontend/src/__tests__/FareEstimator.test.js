@@ -1,5 +1,5 @@
 import { render, fireEvent, screen } from "@testing-library/react";
-import FareEstimator from "../pages/FareEstimator";
+import FareEstimator from "../pages/Rider/FareEstimator";
 import { MemoryRouter } from "react-router-dom";
 
 test("shows error if fields are empty", () => {
