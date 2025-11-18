@@ -15,19 +15,22 @@ export default function BookingDetails() {
     load();
   }, [load]);
 
-  const load = useCallback(() => {
-    try {
-      const data = await bookingAPI.getBooking(id);
-      setBooking(data);
 
-      if (data.driver_id) {
-        const details = await bookingAPI.getDriverDetails(id);
-        setDriver(details.driver);
-      }
-    } catch (err) {
-      console.error("Error loading booking", err);
+// This is your new, correct code
+const load = async () => {
+  try {
+    const data = await bookingAPI.getBooking(id);
+    setBooking(data);
+
+    if (data.driver_id) {
+      const details = await bookingAPI.getDriverDetails(id);
+      setDriver(details.driver);
     }
-  }, []);
+  } catch (err) {
+    console.error("Error loading booking", err);
+  }
+};
+
 
   // ⭐ Rider completes the ride
   const completeRide = async () => {
