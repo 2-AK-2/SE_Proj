@@ -1,6 +1,5 @@
 // src/pages/Rider/BookingDetails.js
 import { useEffect, useCallback } from 'react';
-import { useState } from 'react';
 import { bookingAPI } from "../../api/api";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -16,8 +15,10 @@ export default function BookingDetails() {
   }, [load]);
 
 
-// This is your new, correct code
-const load = async () => {
+// 1. Define the 'load' function FIRST.
+// 2. Wrap it in 'useCallback' (fixes error 1)
+// 3. Mark it as 'async'
+const load = useCallback(async () => {
   try {
     const data = await bookingAPI.getBooking(id);
     setBooking(data);
@@ -29,7 +30,13 @@ const load = async () => {
   } catch (err) {
     console.error("Error loading booking", err);
   }
-};
+}, [id, bookingAPI]); // <-- Add any external variables 'load' uses here (like 'id')
+
+// 4. Define your 'useEffect' hook AFTER 'load'.
+// 5. Add 'load' to the dependency array (fixes errors 2 and 3)
+useEffect(() => {
+  load();
+}, [load]);
 
 
   // ⭐ Rider completes the ride
