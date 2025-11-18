@@ -9,5 +9,8 @@ test("renders Cabify navbar text", () => {
     </MemoryRouter>
   );
 
-  expect(screen.getByText("🚖 Cabify")).toBeInTheDocument();
+  // FIX: Use getByRole to find the *specific* element.
+  // This looks for a link (<a> tag) that has the name "🚖 Cabify".
+  // This is more specific and avoids the "multiple elements" error.
+  expect(screen.getByRole("link", { name: "🚖 Cabify" })).toBeInTheDocument();
 });
