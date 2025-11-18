@@ -1,47 +1,24 @@
-// backend/utils/findNearestDriver.js
-import db from "../config/db.js";
+// react_ak/backend/utils/findNearestDriver.test.js
+// This is a UNIT TEST
 
-// Haversine formula in km
-function distance(lat1, lon1, lat2, lon2) {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+const { getDistance } = require('./findNearestDriver');
 
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+describe('findNearestDriver Utility', () => {
 
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
+  describe('getDistance (Unit Test)', () => {
 
-export const findNearestDriver = async (pickupLat, pickupLng) => {
-  const [drivers] = await db.execute(`
-    SELECT id, latitude, longitude 
-    FROM drivers 
-    WHERE verified = 1
-  `);
+    it('should return 0 for the same coordinates', () => {
+      const coords1 = { latitude: 40.7128, longitude: -74.0060 }; // New York
+      const coords2 = { latitude: 40.7128, longitude: -74.0060 }; // New York
+      expect(getDistance(coords1, coords2)).toBe(0);
+    });
 
-  if (drivers.length === 0) return null;
-
-  let nearest = null;
-  let min = Infinity;
-
-  for (const d of drivers) {
-    const dist = distance(
-      pickupLat,
-      pickupLng,
-      d.latitude,
-      d.longitude
-    );
-
-    if (dist < min) {
-      min = dist;
-      nearest = d;
-    }
-  }
-
-  return nearest;
-};
+    it('should correctly calculate the distance between two points', () => {
+      const coords1 = { latitude: 40.7128, longitude: -74.0060 }; // New York
+      const coords2 = { latitude: 34.0522, longitude: -118.2437 }; // Los Angeles
+      
+      const distance = getDistance(coords1, coords2);
+      expect(distance).toBeCloseTo(3935.7, 1); // Close to 3935.7 km
+    });
+  });
+});
