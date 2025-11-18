@@ -1,6 +1,6 @@
 // src/api/index.js
 import axios from "axios";
-import { getToken, getDriverToken, getRiderToken } from "../utils/authHelper";
+import { getToken } from "../utils/authHelper";
 
 const baseURL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 

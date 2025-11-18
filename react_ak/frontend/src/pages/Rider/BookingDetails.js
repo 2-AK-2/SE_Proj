@@ -1,5 +1,6 @@
 // src/pages/Rider/BookingDetails.js
-import React, { useEffect, useState } from "react";
+import { useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { bookingAPI } from "../../api/api";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -14,7 +15,7 @@ export default function BookingDetails() {
     load();
   }, [load]);
 
-  const load = async () => {
+  const load = useCallback(() => {
     try {
       const data = await bookingAPI.getBooking(id);
       setBooking(data);
@@ -26,7 +27,7 @@ export default function BookingDetails() {
     } catch (err) {
       console.error("Error loading booking", err);
     }
-  };
+  }, []);
 
   // ⭐ Rider completes the ride
   const completeRide = async () => {
