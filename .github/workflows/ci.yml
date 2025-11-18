@@ -25,6 +25,7 @@ jobs:
         with:
           node-version: 18
           cache: "npm"
+          # This path is correct, as it's relative to the repo root
           cache-dependency-path: react_ak/frontend/package-lock.json
 
       - name: Install Dependencies
@@ -34,36 +35,44 @@ jobs:
         run: npm run build
 
       - name: Run Tests with Coverage
-        run: npm test -- --coverage || true
+        # Run tests. If they fail, the pipeline will correctly fail (removed || true)
+        run: npm test -- --coverage
 
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
+          # This path is correct, as it's relative to the repo root
           path: react_ak/frontend/coverage/
 
       - name: Run ESLint
+        # Use continue-on-error so the job reports the error but doesn't stop
+        continue-on-error: true
         run: |
-          npm run lint > lint-report.txt 2>&1 || true
+          npm run lint > lint-report.txt 2>&1
 
       - name: Upload Lint Report
         uses: actions/upload-artifact@v4
         with:
           name: lint-report
-          path: lint-report.txt
+          # FIX: Provide the full path to the generated report
+          path: react_ak/frontend/lint-report.txt
 
       - name: Security Scan (npm audit)
+        # Use continue-on-error to report security issues without stopping the build
+        continue-on-error: true
         run: |
-          npm audit --json > security-report.json || true
+          npm audit --json > security-report.json
 
       - name: Upload Security Report
         uses: actions/upload-artifact@v4
         with:
           name: security-report
-          path: security-report.json
+          # FIX: Provide the full path to the generated report
+          path: react_ak/frontend/security-report.json
 
   # ===================================================
-  # 2️⃣ PACKAGE ARTIFACT (FIXED)
+  # 2️⃣ PACKAGE ARTIFACT
   # ===================================================
   package-artifact:
     name: "Create Deployment Artifact"
@@ -94,12 +103,17 @@ jobs:
       - name: Package Deployment Files
         run: |
           mkdir -p deployment
+          # Copy all source code from the frontend folder
           cp -r react_ak/frontend/src deployment/src
+          # Copy package files
           cp react_ak/frontend/package.json deployment/
           cp react_ak/frontend/package-lock.json deployment/
+          # Copy the downloaded reports
           cp -r reports deployment/reports
+          # Copy the main README
           cp README.md deployment/ || true
           
+          # Go into the deployment folder and zip its contents
           cd deployment
           zip -r ../deployment-package.zip .
 
