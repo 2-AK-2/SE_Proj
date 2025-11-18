@@ -10,39 +10,33 @@ export default function BookingDetails() {
   const [booking, setBooking] = useState(null);
   const [driver, setDriver] = useState(null);
 
+  // 1. Define the 'load' function FIRST, marked async
+  // 2. Wrap it in 'useCallback'
+  // 3. Only include 'id' in the dependency array (not bookingAPI)
+  const load = useCallback(async () => {
+    try {
+      const data = await bookingAPI.getBooking(id);
+      setBooking(data);
+
+      if (data.driver_id) {
+        const details = await bookingAPI.getDriverDetails(id);
+        setDriver(details.driver);
+      }
+    } catch (err) {
+      console.error("Error loading booking", err);
+    }
+  }, [id]); // <-- 'id' is the only dependency
+
+  // 4. Define your 'useEffect' hook AFTER 'load'
+  // 5. Add 'load' to the dependency array
   useEffect(() => {
     load();
   }, [load]);
 
-
-// 1. Define the 'load' function FIRST.
-// 2. Wrap it in 'useCallback' (fixes error 1)
-// 3. Mark it as 'async'
-const load = useCallback(async () => {
-  try {
-    const data = await bookingAPI.getBooking(id);
-    setBooking(data);
-
-    if (data.driver_id) {
-      const details = await bookingAPI.getDriverDetails(id);
-      setDriver(details.driver);
-    }
-  } catch (err) {
-    console.error("Error loading booking", err);
-  }
-}, [id, bookingAPI]); // <-- Add any external variables 'load' uses here (like 'id')
-
-// 4. Define your 'useEffect' hook AFTER 'load'.
-// 5. Add 'load' to the dependency array (fixes errors 2 and 3)
-useEffect(() => {
-  load();
-}, [load]);
-
-
   // ⭐ Rider completes the ride
   const completeRide = async () => {
     try {
-      await bookingAPI.updateStatus(id, "completed_rider");  // ⭐ FIXED
+      await bookingAPI.updateStatus(id, "completed_rider");
       nav(`/rider/pay/${id}`);
     } catch (err) {
       alert(err.response?.data?.message || "Error completing ride");
