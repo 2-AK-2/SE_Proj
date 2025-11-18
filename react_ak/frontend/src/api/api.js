@@ -1,6 +1,6 @@
 // frontend/src/api/api.js
 import axios from "axios";
-import { getRiderToken, getDriverToken, getToken } from "../utils/authHelper";
+import { getToken } from "../utils/authHelper";
 
 const baseURL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 const instance = axios.create({ baseURL, headers: { "Content-Type": "application/json" } });

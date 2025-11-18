@@ -12,7 +12,7 @@ export default function BookingDetails() {
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
   const load = async () => {
     try {
