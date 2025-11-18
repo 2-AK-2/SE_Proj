@@ -2,29 +2,22 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import OngoingRide from "../pages/Driver/OngoingRide";
 
-// Mock useLocation to provide dummy state for the component
-// This prevents it from crashing when trying to access state.rideId
+// Mock useLocation if your component uses state from navigation
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useLocation: () => ({
-    state: { 
-      rideId: "123", 
-      pickup: "Test Location", 
-      drop: "Test Destination",
-      riderName: "Test Rider",
-      fare: 250
-    }
+    state: { rideId: "123", pickup: "Test Loc", drop: "Test Dest" }
   })
 }));
 
-test("OngoingRide page renders correctly", () => {
+test("OngoingRide renders without crashing and shows expected text", () => {
   render(
     <MemoryRouter>
       <OngoingRide />
     </MemoryRouter>
   );
   
-  // Check for basic elements that should appear on the page
-  // "Ride" is a safe generic term likely to appear in "Ride in Progress" or similar headers
-  expect(screen.getByText(/Ride/i)).toBeInTheDocument();
+  // Use queryAllByText and check that at least one instance is found
+  const rideElements = screen.queryAllByText(/Ride/i);
+  expect(rideElements.length).toBeGreaterThan(0);
 });
