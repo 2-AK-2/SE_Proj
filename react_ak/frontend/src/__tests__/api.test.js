@@ -1,34 +1,32 @@
 import { fareAPI } from "../api/api";
 import axios from "axios";
 
-// FIX: Define the mock inside the factory to avoid ReferenceError (hoisting issues)
-jest.mock("axios", () => {
-  const mockAxiosInstance = {
-    get: jest.fn(),
-    post: jest.fn(),
-    put: jest.fn(),
-    delete: jest.fn(),
-    interceptors: {
-      request: { use: jest.fn(), eject: jest.fn() },
-      response: { use: jest.fn(), eject: jest.fn() },
-    },
-    defaults: { headers: { common: {} } },
-  };
+// Define the mock instance
+const mockAxiosInstance = {
+  get: jest.fn(),
+  post: jest.fn(),
+  put: jest.fn(),
+  delete: jest.fn(),
+  interceptors: {
+    request: { use: jest.fn(), eject: jest.fn() },
+    response: { use: jest.fn(), eject: jest.fn() },
+  },
+  defaults: { headers: { common: {} } },
+};
 
-  return {
-    // This handles 'import axios from "axios"'
-    __esModule: true,
-    default: {
-      create: jest.fn(() => mockAxiosInstance),
-    },
-    // This handles if axios is required or used as a named import
-    create: jest.fn(() => mockAxiosInstance),
-  };
-});
+// Mock axios module
+jest.mock("axios", () => ({
+  create: jest.fn(() => mockAxiosInstance),
+  // Add default export methods if needed
+  get: jest.fn(),
+  post: jest.fn(),
+}));
 
 describe("Fare API", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Ensure create returns our instance
+    axios.create.mockReturnValue(mockAxiosInstance);
   });
 
   test("fareAPI is defined", () => {
@@ -36,17 +34,14 @@ describe("Fare API", () => {
   });
 
   test("getFare calls the correct endpoint", async () => {
-    // 1. Create the instance (this will return our mock above)
-    const axiosInstance = axios.create();
-    
-    // 2. Setup the mock response
+    // Setup mock response
     const mockResponse = { data: { fare: 250 } };
-    axiosInstance.post.mockResolvedValue(mockResponse);
+    mockAxiosInstance.post.mockResolvedValue(mockResponse);
 
-    // 3. Call the API function
+    // Call the API
     await fareAPI.getFare("Kormangala", "Indiranagar");
 
-    // 4. Verify post was called
-    expect(axiosInstance.post).toHaveBeenCalled();
+    // Verify axios.post was called
+    expect(mockAxiosInstance.post).toHaveBeenCalled();
   });
 });
